@@ -19,9 +19,8 @@ public class FfsService {
         return RegionConfig.HEADER;
     };
 
-    public FeatureStatus[] fetchData(){
-        FeatureStatus[] features = ffsDao.fetchStatus();
-        return features;
+    public ApiMessage fetchData(){
+        return ffsDao.fetchStatus();
     }
 
     public ApiMessage updateFeatures(FeatureStatus fs){

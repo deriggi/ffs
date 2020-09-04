@@ -1,6 +1,7 @@
 package sony.deriggi.ffs.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,17 +30,20 @@ public class FfsController {
 
     @CrossOrigin(origins = "http://localhost:1234" )
     @RequestMapping(value = "/ffs", method = RequestMethod.GET)
+    
 	public ResponseEntity<?> getSites() throws Exception {
-	    return ResponseEntity.ok(ffsService.fetchData());
+        ApiMessage message  = ffsService.fetchData();
+        return ResponseEntity.status(message.getStatusCode())
+        .body(message.getDataItems());
+        
     }
 
     @CrossOrigin(origins = "http://localhost:1234")
     @RequestMapping(value = "/ffs", method = RequestMethod.POST)
 	public ResponseEntity<?> addOrUpdate(@RequestBody FeatureStatus fs) throws Exception {
         ApiMessage message  = ffsService.updateFeatures(fs);
-        BodyBuilder builder = ResponseEntity.status(message.getStatusCode());
-        builder.body(message.getDataItems());
-        return builder.build();
+        return ResponseEntity.status(message.getStatusCode())
+        .body(message.getDataItems());
     }
     
 }

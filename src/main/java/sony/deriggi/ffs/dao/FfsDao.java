@@ -11,6 +11,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,19 +34,19 @@ public class FfsDao {
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
 
-    public ApiMessage createOrUpdate(FeatureStatus fs) {
+    public ApiMessage createOrUpdate(final FeatureStatus fs) {
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(URL).append(PATH);
-        HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
-        ObjectMapper objectMapper = new ObjectMapper();
+        final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
+        final ObjectMapper objectMapper = new ObjectMapper();
         String requestBody;
-        ApiMessage message = new ApiMessage();
+        final ApiMessage message = new ApiMessage();
 
         try {
 
             requestBody = objectMapper.writeValueAsString(fs);
-            HttpRequest request = HttpRequest.newBuilder().header(CONTENT_TYPE, APPLICATION_JSON)
+            final HttpRequest request = HttpRequest.newBuilder().header(CONTENT_TYPE, APPLICATION_JSON)
                     .uri(URI.create(sb.toString()))
                     .POST(BodyPublishers.ofString(requestBody))
                     .build();
@@ -58,12 +59,12 @@ public class FfsDao {
             message.setStatusCode(response.statusCode());
 
             if (response.statusCode() >= 400) {
-                List<ErrorMessage> dataItems = new ArrayList<>(1);
-                ErrorMessage error = handlePostException(responseBody);
+                final List<ErrorMessage> dataItems = new ArrayList<>(1);
+                final ErrorMessage error = handlePostException(responseBody);
                 dataItems.add(error);
                 message.setDataItems(dataItems);
             }else if(response.statusCode() >= 200){
-                List<FeatureStatus> dataItems = Arrays.asList(handleOkResponse(responseBody));
+                final List<FeatureStatus> dataItems = Arrays.asList(handleOkResponse(responseBody));
                 message.setDataItems(dataItems);
             }else{
                 message.setDataItems(new ArrayList<>(0));;
@@ -78,62 +79,64 @@ public class FfsDao {
         return message;
     }
 
-    private ErrorMessage handlePostException(String responseBody) {
-        TypeReference<ErrorMessage> typeRef = new TypeReference<ErrorMessage>() {};
-        ObjectMapper mapper = new ObjectMapper();
+    private ErrorMessage handlePostException(final String responseBody) {
+        final TypeReference<ErrorMessage> typeRef = new TypeReference<ErrorMessage>() {};
+        final ObjectMapper mapper = new ObjectMapper();
         ErrorMessage map;
         try {
             map = mapper.readValue(responseBody, typeRef);
             return map;
             
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             e.printStackTrace();
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private FeatureStatus[] handleOkResponse(String responseBody) {
-        TypeReference<FeatureStatus[]> typeRef = new TypeReference<FeatureStatus[]>() {
+    private FeatureStatus[] handleOkResponse(final String responseBody) {
+        final TypeReference<FeatureStatus[]> typeRef = new TypeReference<FeatureStatus[]>() {
         };
-        ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
 
         FeatureStatus[] features;
         try {
             features = mapper.readValue(responseBody, typeRef);
             return features;
             
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             e.printStackTrace();
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public FeatureStatus[] fetchStatus() {
+    public ApiMessage fetchStatus() {
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(URL).append(PATH);
-        HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
+        final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
         FeatureStatus[] allFs;
 
-        HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(sb.toString()))
             .header(CONTENT_TYPE, APPLICATION_JSON).build();
+        final ApiMessage message = new ApiMessage();
 
         try {
-            allFs = client.send(request, new JsonBodyHandler<>(FeatureStatus[].class)).body().get();
-            
-
+            HttpResponse<Supplier<FeatureStatus[]>> response = client.send(request, new JsonBodyHandler<>(FeatureStatus[].class));
+            allFs = response.body().get();
+            message.setDataItems(Arrays.asList(allFs));
+            message.setStatusCode(response.statusCode());
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            allFs = new FeatureStatus[0];
-            // 500
+            message.setStatusCode(500);
+            message.setDataItems(new ArrayList<>(0));
         }
         
-        return allFs;
+        return message;
 
     }
     
