@@ -14,10 +14,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.stereotype.Repository;
+
 import sony.deriggi.ffs.dto.ApiMessage;
 import sony.deriggi.ffs.dto.FeatureStatus;
 import sony.deriggi.ffs.json.JsonBodyHandler;
 
+@Repository
 public class FfsDao {
 
     private static final String URL = "http://localhost:12300/";
@@ -25,14 +28,14 @@ public class FfsDao {
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
 
-    public void createOrUpdate(FeatureStatus fs) {
+    public FeatureStatus[] createOrUpdate(FeatureStatus fs) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(URL).append(PATH);
         HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody;
-
+        FeatureStatus[] responseStatus = null;
         try {
 
             requestBody = objectMapper.writeValueAsString(fs);
@@ -50,14 +53,19 @@ public class FfsDao {
 
             if (response.statusCode() >= 400) {
                 handlePostException(responseBody);
+                responseStatus= null;
+            }else if(response.statusCode() >= 200){
+                responseStatus= handleOkResponse(responseBody);
             }else{
-                System.out.println(responseBody);
-
+                responseStatus= null;
             }
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            responseStatus = null;
         }
+
+        return responseStatus;
 
     }
 
@@ -71,6 +79,24 @@ public class FfsDao {
             map = mapper.readValue(responseBody, typeRef);
             System.out.println(map);
             return map;
+            
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private FeatureStatus[] handleOkResponse(String responseBody) {
+        TypeReference<FeatureStatus[]> typeRef = new TypeReference<FeatureStatus[]>() {
+        };
+        ObjectMapper mapper = new ObjectMapper();
+
+        FeatureStatus[] features;
+        try {
+            features = mapper.readValue(responseBody, typeRef);
+            return features;
             
         } catch (JsonMappingException e) {
             e.printStackTrace();

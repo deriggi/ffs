@@ -4,10 +4,14 @@ public class FeatureStatus {
 
     private String name;
     private Integer value;
+    private Integer[] flags;
+
     private final static String SPACE = " ";
 
-    public FeatureStatus(){
+    public FeatureStatus() {
     }
+
+    
 
     @Override
     public String toString(){
@@ -38,6 +42,14 @@ public class FeatureStatus {
     public void setValue(Integer value) {
         this.value = value;
     }
+
+    public Integer[] getFlags() {
+        return flags; 
+     }
+ 
+     public void setFlags(Integer[] flags) {
+         this.flags = flags;
+     }
 
     
 }
