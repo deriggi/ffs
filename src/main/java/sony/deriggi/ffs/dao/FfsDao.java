@@ -48,7 +48,6 @@ public class FfsDao {
             String responseBody = null;
 
             response = client.send(request, BodyHandlers.ofString());
-            System.out.println(response.statusCode());
             responseBody = response.body();
 
             if (response.statusCode() >= 400) {
@@ -70,14 +69,11 @@ public class FfsDao {
     }
 
     private ApiMessage handlePostException(String responseBody) {
-        TypeReference<ApiMessage> typeRef = new TypeReference<ApiMessage>() {
-        };
+        TypeReference<ApiMessage> typeRef = new TypeReference<ApiMessage>() {};
         ObjectMapper mapper = new ObjectMapper();
-
         ApiMessage map;
         try {
             map = mapper.readValue(responseBody, typeRef);
-            System.out.println(map);
             return map;
             
         } catch (JsonMappingException e) {
@@ -119,9 +115,7 @@ public class FfsDao {
 
         try {
             allFs = client.send(request, new JsonBodyHandler<>(FeatureStatus[].class)).body().get();
-            for(FeatureStatus fs: allFs ){
-                System.out.println(fs.toString());
-            }
+            
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

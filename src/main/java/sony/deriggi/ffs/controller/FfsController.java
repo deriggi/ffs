@@ -21,8 +21,14 @@ public class FfsController {
     FfsService ffsService;
 
     @CrossOrigin(origins = "http://localhost:1234")
+    @RequestMapping(value = "/regions", method = RequestMethod.GET)
+	public ResponseEntity<?> getHeader() throws Exception {
+	    return ResponseEntity.ok(ffsService.fetchHeader());
+    }
+
+    @CrossOrigin(origins = "http://localhost:1234" )
     @RequestMapping(value = "/ffs", method = RequestMethod.GET)
-	public ResponseEntity<?> getArtists() throws Exception {
+	public ResponseEntity<?> getSites() throws Exception {
 	    return ResponseEntity.ok(ffsService.fetchData());
     }
 
