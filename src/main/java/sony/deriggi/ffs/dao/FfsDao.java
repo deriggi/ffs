@@ -124,15 +124,6 @@ public class FfsDao {
         
         return allFs;
 
-
-    }
-
-    public static void main(String[] agrs){
-        // new FfsDao().fetchStatus();
-        
-        // new FfsDao().createOrUpdate(new FeatureStatus("Identity_Information", 8));
-        new FfsDao().createOrUpdate(new FeatureStatus(null, 8));
-
     }
     
 }
