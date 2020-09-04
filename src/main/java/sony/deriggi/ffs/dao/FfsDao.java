@@ -1,9 +1,6 @@
 package sony.deriggi.ffs.dao;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
