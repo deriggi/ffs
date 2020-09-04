@@ -1,34 +1,26 @@
 package sony.deriggi.ffs.dto;
 
+import java.util.List;
+
 public class ApiMessage {
-    private Integer code;
-    private String message;
+    private List<? extends ApiDatum> dataItems;
+    private Integer statusCode;
 
-    public ApiMessage(){
-
+    public void setDataItems(List<? extends ApiDatum> items){
+        dataItems = items;
     }
 
-    public Integer getCode() {
-        return code;
+    public List<? extends ApiDatum> getDataItems(){
+        return dataItems;
     }
 
-    public String getMessage() {
-        return message;
+	public Integer getStatusCode() {
+		return statusCode;
     }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append(message);
-        return sb.toString();
-    }
-
-
+    
+	public void setStatusCode(Integer statusCode) {
+		this.statusCode = statusCode;
+	}
+    
+    
 }

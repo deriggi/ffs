@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import sony.deriggi.ffs.RegionConfig;
 
-public class FeatureStatus {
+public class FeatureStatus  implements ApiDatum{
 
     private String name;
     private Integer value;

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import sony.deriggi.ffs.RegionConfig;
 import sony.deriggi.ffs.dao.FfsDao;
+import sony.deriggi.ffs.dto.ApiMessage;
 import sony.deriggi.ffs.dto.FeatureStatus;
 
 @Service
@@ -23,7 +24,7 @@ public class FfsService {
         return features;
     }
 
-    public FeatureStatus[] updateFeatures(FeatureStatus fs){
+    public ApiMessage updateFeatures(FeatureStatus fs){
         return ffsDao.createOrUpdate( fs );
 
     }
